@@ -4,7 +4,7 @@ TARGET = qmlrosplugin
 CONFIG += qt plugin c++11
 CONFIG -= android_install
 
-QT += qml quick bluetooth
+QT += qml quick
 
 QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -20,8 +20,9 @@ HEADERS += \
     src/RosNode.h
 
 SOURCES += \
-    src/RosNode.cpp \
-    src/QMLRosPlugin.cpp
+    src/QMLRosPlugin.cpp \
+    src/RosNode.cpp
+
 OTHER_FILES += qmldir
 
 INCLUDEPATH += /home/florian/ros-android-ndk/sample/roscpp_android_ndk/include
