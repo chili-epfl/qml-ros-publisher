@@ -27,13 +27,16 @@
 #include <android/log.h>
 
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 
 #include <stdarg.h>
+
+ros::Publisher samplePublisher;
 
 void log(const char *msg, ...) {
     va_list args;
     va_start(args, msg);
-    __android_log_vprint(ANDROID_LOG_INFO, "ROSCPP_NDK_EXAMPLE", msg, args);
+    __android_log_vprint(ANDROID_LOG_INFO, "RosNode", msg, args);
     va_end(args);
 }
 
@@ -51,13 +54,13 @@ RosNode::~RosNode(){
 void RosNode::startNode() {
     int argc = 3;
     QByteArray nodeName = QString("ros_node_plugin").toUtf8();
-    QByteArray master = QString("__master:=http://" + ipMaster).toUtf8();
-    QByteArray ip = QString("__ip:=http://" + ipNode).toUtf8();
+    QByteArray master = QString("__master:=http://" + ipMaster + ":11311").toUtf8();
+    QByteArray ip = QString("__ip:=" + ipNode).toUtf8();
     char *argv[3] = { nodeName.data(), master.data(), ip.data() };
 
 
-    log("GOING TO ROS INIT");
-    for(int i = 0; i < argc; i++){
+    log("Initializing ROS");
+    for (int i = 0; i < argc; i++) {
         log(argv[i]);
     }
 
@@ -65,13 +68,29 @@ void RosNode::startNode() {
 
     emit RosNode::statusChanged();
 
-    if(ros::master::check()){
-        log("ROS MASTER IS UP!");
+    if (ros::master::check()) {
+        log("ROS master found!");
     } else {
-        log("NO ROS MASTER.");
+        log("No ROS master.");
     }
 
-    log("GOING TO NODEHANDLE");
+    log(ros::master::getURI().c_str());
 
-    ros::NodeHandle n;
+    ros::NodeHandle nodeHandle;
+
+    samplePublisher = nodeHandle.advertise<std_msgs::String>("ros_node_sample_topic", 1000);
+}
+
+void RosNode::publish(QString msg) {
+    if (!ros::ok()) {
+        log("ros::ok() returned false!");
+        return;
+    }
+
+    QByteArray ba = msg.toUtf8();
+    std_msgs::String rosMsg;
+    rosMsg.data = ba.data();
+    samplePublisher.publish(rosMsg);
+
+    ros::spinOnce();
 }

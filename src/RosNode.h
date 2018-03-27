@@ -37,7 +37,7 @@ class RosNode : public QQuickItem {
     Q_PROPERTY(QString ipNode READ getIpNode WRITE setIpNode NOTIFY ipNodeChanged)
 
 public:
-    enum Status {
+    enum Status : uint8_t {
         IDLE,
         RUNNING,
     };
@@ -93,9 +93,16 @@ public:
 public slots:
 
     /**
-     * @brief Initializes the ROS node with the given IP addresses
+     * @brief Initializes the ROS node
      */
     void startNode();
+
+    /**
+     * @brief Publishes a String message
+     *
+     * @param The message to publish
+     */
+    void publish(QString msg);
 
 signals:
     /**
