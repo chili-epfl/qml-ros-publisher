@@ -12,10 +12,15 @@ ApplicationWindow {
 
     RosNode{
         id: rosNode
-        ipMaster: masterIpField.text
-        ipNode: nodeIpField.text
+        masterIp: masterIpField.text
 
-        onStatusChanged: console.log("Status: " + rosNode.status)
+        onStatusChanged: {
+            status.text = rosNode.status
+            if (rosNode.status == "Idle")
+                status.color = "gray";
+            else
+                status.color = "blue";
+        }
     }
 
     Row{
@@ -31,17 +36,24 @@ ApplicationWindow {
                     text: "192.168.1.100"
                 }
 
-                Label{
-                    text: "This device's IP address"
-                }
-                TextField{
-                    id: nodeIpField
-                    text: "192.168.1.101"
+                Button{
+                    text: "Start"
+                    onClicked: rosNode.startNode();
                 }
 
                 Button{
-                    text: "Run"
-                    onClicked: rosNode.startNode()
+                    text: "Stop"
+                    onClicked: rosNode.stopNode();
+                }
+
+                Label{
+                    text: "Status:"
+                }
+
+                Text{
+                    id: status
+                    text: "Idle"
+                    color: "gray"
                 }
             }
         }

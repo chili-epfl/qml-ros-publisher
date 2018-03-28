@@ -32,16 +32,10 @@ class RosNode : public QQuickItem {
     Q_OBJECT
     /* *INDENT-ON* */
 
-    Q_PROPERTY(Status status READ getStatus NOTIFY statusChanged)
-    Q_PROPERTY(QString ipMaster READ getIpMaster WRITE setIpMaster NOTIFY ipMasterChanged)
-    Q_PROPERTY(QString ipNode READ getIpNode WRITE setIpNode NOTIFY ipNodeChanged)
+    Q_PROPERTY(QString status READ getStatus NOTIFY statusChanged)
+    Q_PROPERTY(QString masterIp READ getMasterIp WRITE setMasterIp NOTIFY masterIpChanged)
 
 public:
-    enum Status : uint8_t {
-        IDLE,
-        RUNNING,
-    };
-
     /**
      * @brief Creates a new RosNode with the given QML parent
      *
@@ -59,36 +53,21 @@ public:
      *
      * @return This ROS node's status
      */
-    Status getStatus() const { return status; }
+    QString getStatus() const { return status; }
 
     /**
      * @brief Gets the ROS master's IP address
      *
      * @return The ROS master's IP address
      */
-    QString getIpMaster() const { return ipMaster; }
+    QString getMasterIp() const { return masterIp; }
 
     /**
      * @brief Sets the ROS master's IP address
      *
      * @param The ROS master's IP address
      */
-    void setIpMaster(QString ipMaster) { this->ipMaster = ipMaster; }
-
-    /**
-     * @brief Gets this ROS node's IP address
-     *
-     * @return This ROS node's IP address
-     */
-    QString getIpNode() const { return ipNode; }
-
-
-    /**
-     * @brief Gets this ROS node's IP address
-     *
-     * @param This ROS node's IP address
-     */
-    void setIpNode(QString ipNode) { this->ipNode = ipNode; }
+    void setMasterIp(QString masterIp) { this->masterIp = masterIp; }
 
 public slots:
 
@@ -98,7 +77,12 @@ public slots:
     void startNode();
 
     /**
-     * @brief Publishes a String message
+     * @brief Kills the ROS node
+     */
+    void stopNode();
+
+    /**
+     * @brief Publishes a string message
      *
      * @param The message to publish
      */
@@ -113,17 +97,11 @@ signals:
     /**
      * @brief Emitted when the ROS master's IP address changes
      */
-    void ipMasterChanged();
-
-    /**
-     * @brief Emitted when this ROS node's IP address changes
-     */
-    void ipNodeChanged();
+    void masterIpChanged();
 
 private:
-    Status status;                    ///< Status of this ROS node
-    QString ipMaster;                 ///< IP address of ROS master
-    QString ipNode;                   ///< IP of this ROS node
+    QString status;                   ///< Status of this ROS node
+    QString masterIp;                 ///< IP address of ROS master
 };
 
 #endif /* ROSNODE_H */

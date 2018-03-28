@@ -29,6 +29,8 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 
+#include <QNetworkInterface>
+
 #include <stdarg.h>
 
 ros::Publisher samplePublisher;
@@ -40,50 +42,78 @@ void log(const char *msg, ...) {
     va_end(args);
 }
 
+QString getDeviceIpAddress() {
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+
+    for(int i = 0; i < list.count(); ++i) {
+      if(!list[i].isLoopback()) {
+          if (list[i].protocol() == QAbstractSocket::IPv4Protocol)
+            return list[i].toString();
+      }
+    }
+
+    return "";
+}
+
 RosNode::RosNode(QQuickItem* parent):
     QQuickItem(parent)
 {
-    status = Status::IDLE;
-    ipMaster = "192.168.1.100:11311";
-    ipNode = "193.168.1.101";
+    status = "Idle";
+    masterIp = "192.168.1.100:11311";
 }
 
 RosNode::~RosNode(){
+    stopNode();
 }
 
 void RosNode::startNode() {
-    int argc = 3;
-    QByteArray nodeName = QString("ros_node_plugin").toUtf8();
-    QByteArray master = QString("__master:=http://" + ipMaster + ":11311").toUtf8();
-    QByteArray ip = QString("__ip:=" + ipNode).toUtf8();
-    char *argv[3] = { nodeName.data(), master.data(), ip.data() };
+    QString nodeIp = getDeviceIpAddress();
+    QString sanitizedNodeIp = QString(nodeIp).replace('.', '_');
+    QByteArray tmp = nodeIp.toUtf8();
+    log("Node IP: %s", tmp.data());
 
+    int argc = 3;
+    QByteArray master = QString("__master:=http://" + masterIp + ":11311").toUtf8();
+    QByteArray ip = QString("__ip:=" + nodeIp).toUtf8();
+    char *argv[argc] = { "ros_qml_plugin", master.data(), ip.data() };
 
     log("Initializing ROS");
-    for (int i = 0; i < argc; i++) {
-        log(argv[i]);
+    for (int i = 0; i < argc; ++i) {
+        log("Argument %i: %s", i, argv[i]);
     }
 
-    ros::init(argc, &argv[0], "android_ndk_native_cpp");
-
-    emit RosNode::statusChanged();
+    QString nodeName("ros_qml_plugin_" + sanitizedNodeIp);
+    const std::string nodeNameStdString = nodeName.toStdString();
+    ros::init(argc, &argv[0], nodeNameStdString);
 
     if (ros::master::check()) {
-        log("ROS master found!");
+        log("ROS master found");
     } else {
-        log("No ROS master.");
+        log("No ROS master");
     }
 
     log(ros::master::getURI().c_str());
 
     ros::NodeHandle nodeHandle;
 
-    samplePublisher = nodeHandle.advertise<std_msgs::String>("ros_node_sample_topic", 1000);
+    QString topic("ros_qml_plugin_" + sanitizedNodeIp + "_strings");
+    const std::string topicStdString = topic.toStdString();
+    samplePublisher = nodeHandle.advertise<std_msgs::String>(topicStdString, 1000);
+
+    status = "Running";
+    emit RosNode::statusChanged();
+}
+
+void RosNode::stopNode() {
+    ros::shutdown();
+
+    status = "Idle";
+    emit RosNode::statusChanged();
 }
 
 void RosNode::publish(QString msg) {
     if (!ros::ok()) {
-        log("ros::ok() returned false!");
+        log("Cannot publish: ros::ok() returned false");
         return;
     }
 
@@ -91,6 +121,4 @@ void RosNode::publish(QString msg) {
     std_msgs::String rosMsg;
     rosMsg.data = ba.data();
     samplePublisher.publish(rosMsg);
-
-    ros::spinOnce();
 }
