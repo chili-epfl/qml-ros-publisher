@@ -27,13 +27,15 @@
 #include <android/log.h>
 
 #include <ros/ros.h>
+#include <geometry_msgs/Pose.h>
 #include <std_msgs/String.h>
 
 #include <QNetworkInterface>
 
 #include <stdarg.h>
 
-ros::Publisher samplePublisher;
+ros::Publisher stringPublisher;
+ros::Publisher posePublisher;
 
 void log(const char *msg, ...) {
     va_list args;
@@ -96,9 +98,14 @@ void RosNode::startNode() {
 
     ros::NodeHandle nodeHandle;
 
-    QString topic("ros_qml_plugin_" + sanitizedNodeIp + "_strings");
-    const std::string topicStdString = topic.toStdString();
-    samplePublisher = nodeHandle.advertise<std_msgs::String>(topicStdString, 1000);
+    QString stringTopic("ros_qml_plugin_" + sanitizedNodeIp + "_string");
+    // const std::string topicStdString = topic.toStdString();
+
+    QString poseTopic("ros_qml_plugin_" + sanitizedNodeIp + "_pose");
+    // const std::string topicGeometryPose = topic.toStdString();
+
+    stringPublisher = nodeHandle.advertise<std_msgs::String>(stringTopic.toStdString(), 1000);
+    posePublisher = nodeHandle.advertise<geometry_msgs::Pose>(poseTopic.toStdString(), 1000);
 
     status = "Running";
     emit RosNode::statusChanged();
@@ -120,5 +127,23 @@ void RosNode::publish(QString msg) {
     QByteArray ba = msg.toUtf8();
     std_msgs::String rosMsg;
     rosMsg.data = ba.data();
-    samplePublisher.publish(rosMsg);
+    stringPublisher.publish(rosMsg);
+}
+
+void RosNode::publish(QVector3D position, QQuaternion orientation) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    geometry_msgs::Pose rosMsg;
+    rosMsg.position.x = position.x();
+    rosMsg.position.y = position.y();
+    rosMsg.position.z = position.z();
+    rosMsg.orientation.x = orientation.x();
+    rosMsg.orientation.y = orientation.y();
+    rosMsg.orientation.z = orientation.z();
+    rosMsg.orientation.w = orientation.scalar();
+
+    posePublisher.publish(rosMsg);
 }

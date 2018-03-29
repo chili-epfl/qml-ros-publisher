@@ -25,6 +25,7 @@
 #ifndef ROSNODE_H
 #define ROSNODE_H
 
+#include <QQuaternion>
 #include <QQuickItem>
 
 class RosNode : public QQuickItem {
@@ -87,6 +88,13 @@ public slots:
      * @param The message to publish
      */
     void publish(QString msg);
+
+    /**
+     * @brief Publishes a pose
+     *
+     * @param The message to publish
+     */
+    void publish(QVector3D position, QQuaternion orientation);
 
 signals:
     /**

@@ -59,7 +59,7 @@ ApplicationWindow {
         }
 
         GroupBox{
-            title: "Publisher"
+            title: "String publisher"
 
             Column{
                 Label{
@@ -74,6 +74,67 @@ ApplicationWindow {
                 Button{
                     text: "Publish"
                     onClicked: rosNode.publish(message.text)
+                }
+            }
+        }
+
+        GroupBox{
+            title: "Pose publisher"
+
+            Column{
+                Label{
+                    text: "Position"
+                }
+
+                TextField{
+                    id: posX
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                TextField{
+                    id: posY
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                TextField{
+                    id: posZ
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                Label{
+                    text: "Orientation"
+                }
+
+                TextField{
+                    id: quatX
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                TextField{
+                    id: quatY
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                TextField{
+                    id: quatZ
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "0.0"
+                }
+
+                TextField{
+                    id: quatW
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    text: "1.0"
+                }
+
+                Button{
+                    text: "Publish"
+                    onClicked: rosNode.publish("posX.text, posY.text, posZ.text", "quatW.text, quatX.text, quatY.text, quatZ.text")
                 }
             }
         }
