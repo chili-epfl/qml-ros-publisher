@@ -52,7 +52,7 @@ ApplicationWindow {
 
                 Text{
                     id: status
-                    text: "Idle"
+                    text: rosNode.status
                     color: "gray"
                 }
             }

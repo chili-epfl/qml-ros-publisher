@@ -50,7 +50,7 @@ ros::Publisher stringPublisher;
 ros::Publisher touchEndPublisher;
 ros::Publisher touchStartPublisher;
 
-void log(const char *msg, ...) {
+static void log(const char *msg, ...) {
     va_list args;
     va_start(args, msg);
 #ifdef Q_OS_ANDROID
@@ -61,7 +61,7 @@ void log(const char *msg, ...) {
     va_end(args);
 }
 
-QString getDeviceIpAddress() {
+static QString getDeviceIpAddress() {
     QList<QHostAddress> list = QNetworkInterface::allAddresses();
 
     for(int i = 0; i < list.count(); ++i) {
@@ -74,16 +74,15 @@ QString getDeviceIpAddress() {
     return "";
 }
 
-RosNode::RosNode(QQuickItem* parent):
-    QQuickItem(parent)
-{
+RosNode::RosNode(QQuickItem* parent)
+: QQuickItem(parent) {
     status = "Idle";
     masterIp = "192.168.1.100";
 
     startNode();
 }
 
-RosNode::~RosNode(){
+RosNode::~RosNode() {
     stopNode();
 }
 
@@ -96,16 +95,15 @@ void RosNode::startNode() {
     int argc = 3;
     QByteArray master = QString("__master:=http://" + masterIp + ":11311").toUtf8();
     QByteArray ip = QString("__ip:=" + nodeIp).toUtf8();
-    char *argv[argc] = { "ros_qml_plugin", master.data(), ip.data() };
+    char *argv[argc] = { "cellulo_qml_plugin", master.data(), ip.data() };
 
     log("Initializing ROS");
     for (int i = 0; i < argc; ++i) {
         log("Argument %i: %s", i, argv[i]);
     }
 
-    QString nodeName("ros_qml_plugin_" + sanitizedNodeIp);
-    const std::string nodeNameStdString = nodeName.toStdString();
-    ros::init(argc, &argv[0], nodeNameStdString);
+    QString nodeName("cellulo_" + sanitizedNodeIp);
+    ros::init(argc, &argv[0], nodeName.toStdString());
 
     if (ros::master::check()) {
         log("ROS master found");
@@ -117,12 +115,12 @@ void RosNode::startNode() {
 
     ros::NodeHandle nodeHandle;
 
-    kidnappedPublisher = nodeHandle.advertise<cellulo_msgs::Kidnapped>("cellulo_kidnapped", 1000);
-    longTouchPublisher = nodeHandle.advertise<cellulo_msgs::LongTouch>("cellulo_long_touch", 1000);
-    posePublisher = nodeHandle.advertise<cellulo_msgs::Pose>("cellulo_pose", 1000);
-    stringPublisher = nodeHandle.advertise<cellulo_msgs::String>("cellulo_string", 1000);
-    touchEndPublisher = nodeHandle.advertise<cellulo_msgs::TouchEnd>("cellulo_touch_end", 1000);
-    touchStartPublisher = nodeHandle.advertise<cellulo_msgs::TouchStart>("cellulo_touch_start", 1000);
+    kidnappedPublisher = nodeHandle.advertise<cellulo_msgs::Kidnapped>("cellulo/kidnapped", 1000);
+    longTouchPublisher = nodeHandle.advertise<cellulo_msgs::LongTouch>("cellulo/long_touch", 1000);
+    posePublisher = nodeHandle.advertise<cellulo_msgs::Pose>("cellulo/pose", 1000);
+    stringPublisher = nodeHandle.advertise<cellulo_msgs::String>("cellulo/string", 1000);
+    touchEndPublisher = nodeHandle.advertise<cellulo_msgs::TouchEnd>("cellulo/touch_end", 1000);
+    touchStartPublisher = nodeHandle.advertise<cellulo_msgs::TouchStart>("cellulo/touch_start", 1000);
 
     status = "Running";
     emit RosNode::statusChanged();
@@ -137,34 +135,89 @@ void RosNode::stopNode() {
     emit RosNode::statusChanged();
 }
 
-void RosNode::publishPose(QString id, float x, float y, float theta) {
-    if (!ros::ok()) {
-        log("Cannot publish: ros::ok() returned false");
-        return;
-    }
-
-    cellulo_msgs::Pose pose;
-    pose.header.stamp = ros::Time::now().toNSec();
-    pose.header.device_id = id.toStdString();
-    pose.position.x = x;
-    pose.position.y = y;
-    pose.angle = theta;
-
-    posePublisher.publish(pose);
+static void fillHeader(cellulo_msgs::Header &header, const QString &id) {
+    header.stamp = ros::Time::now().toNSec();
+    header.device_id = id.toStdString();
 }
 
-void RosNode::publishString(QString id, QString msg) {
+void RosNode::publishKidnapped(const QString &id, bool kidnapped) {
     if (!ros::ok()) {
         log("Cannot publish: ros::ok() returned false");
         return;
     }
 
-    QByteArray ba = msg.toUtf8();
+    cellulo_msgs::Kidnapped msg;
+    fillHeader(msg.header, id);
+    msg.kidnapped = kidnapped;
 
-    cellulo_msgs::String str;
-    str.header.stamp = ros::Time::now().toNSec();
-    str.header.device_id = id.toStdString();
-    str.msg = ba.data();
+    kidnappedPublisher.publish(msg);
+}
 
-    stringPublisher.publish(str);
+void RosNode::publishLongTouch(const QString &id, int key) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    cellulo_msgs::LongTouch msg;
+    fillHeader(msg.header, id);
+    msg.key = key;
+
+    longTouchPublisher.publish(msg);
+}
+
+void RosNode::publishPose(const QString &id, float x, float y, float theta) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    cellulo_msgs::Pose msg;
+    fillHeader(msg.header, id);
+    msg.position.x = x;
+    msg.position.y = y;
+    msg.angle = theta;
+
+    posePublisher.publish(msg);
+}
+
+void RosNode::publishString(const QString &id, const QString &text) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    QByteArray ba = text.toUtf8();
+
+    cellulo_msgs::String msg;
+    fillHeader(msg.header, id);
+    msg.text = ba.data();
+
+    stringPublisher.publish(msg);
+}
+
+void RosNode::publishTouchEnd(const QString &id, int key) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    cellulo_msgs::TouchEnd msg;
+    fillHeader(msg.header, id);
+    msg.key = key;
+
+    touchEndPublisher.publish(msg);
+}
+
+void RosNode::publishTouchStart(const QString &id, int key) {
+    if (!ros::ok()) {
+        log("Cannot publish: ros::ok() returned false");
+        return;
+    }
+
+    cellulo_msgs::TouchStart msg;
+    fillHeader(msg.header, id);
+    msg.key = key;
+
+    touchStartPublisher.publish(msg);
 }

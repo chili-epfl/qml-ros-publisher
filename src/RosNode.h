@@ -54,21 +54,21 @@ public:
      *
      * @return This ROS node's status
      */
-    QString getStatus() const { return status; }
+    const QString &getStatus() const { return status; }
 
     /**
      * @brief Gets the ROS master's IP address
      *
      * @return The ROS master's IP address
      */
-    QString getMasterIp() const { return masterIp; }
+    const QString &getMasterIp() const { return masterIp; }
 
     /**
      * @brief Sets the ROS master's IP address
      *
      * @param The ROS master's IP address
      */
-    void setMasterIp(QString masterIp) { this->masterIp = masterIp; }
+    void setMasterIp(const QString &masterIp) { this->masterIp = masterIp; }
 
 public slots:
 
@@ -83,18 +83,46 @@ public slots:
     void stopNode();
 
     /**
-     * @brief Publishes a string message
+     * @brief Publishes a kidnapped event
      *
-     * @param The message to publish
+     * @param TRUE if kidnapped, FALSE if not
      */
-    void publishString(QString id, QString msg);
+    void publishKidnapped(const QString &id, bool kidnapped);
+
+    /**
+     * @brief Publishes a long touch event
+     *
+     * @param The touch key corresponding to the event
+     */
+    void publishLongTouch(const QString &id, int key);
 
     /**
      * @brief Publishes a pose
      *
      * @param The message to publish
      */
-    void publishPose(QString id, float x, float y, float theta);
+    void publishPose(const QString &id, float x, float y, float theta);
+
+    /**
+     * @brief Publishes a string message
+     *
+     * @param The message to publish
+     */
+    void publishString(const QString &id, const QString &text);
+
+    /**
+     * @brief Publishes a touch ended event
+     *
+     * @param The touch key corresponding to the event
+     */
+    void publishTouchEnd(const QString &id, int key);
+
+    /**
+     * @brief Publishes a touch started event
+     *
+     * @param The touch key corresponding to the event
+     */
+    void publishTouchStart(const QString &id, int key);
 
 signals:
     /**
