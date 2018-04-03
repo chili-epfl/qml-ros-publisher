@@ -87,14 +87,14 @@ public slots:
      *
      * @param The message to publish
      */
-    void publish(QString msg);
+    void publishString(QString id, QString msg);
 
     /**
      * @brief Publishes a pose
      *
      * @param The message to publish
      */
-    void publish(QVector3D position, QQuaternion orientation);
+    void publishPose(QString id, float x, float y, float theta);
 
 signals:
     /**

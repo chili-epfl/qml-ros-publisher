@@ -24,23 +24,40 @@
 
 #include "RosNode.h"
 
+#ifdef Q_OS_ANDROID
 #include <android/log.h>
+#else
+#include <cstdio>
+#endif
 
 #include <ros/ros.h>
-#include <geometry_msgs/Pose.h>
 #include <std_msgs/String.h>
+#include <cellulo_msgs/Kidnapped.h>
+#include <cellulo_msgs/LongTouch.h>
+#include <cellulo_msgs/Pose.h>
+#include <cellulo_msgs/String.h>
+#include <cellulo_msgs/TouchEnd.h>
+#include <cellulo_msgs/TouchStart.h>
 
 #include <QNetworkInterface>
 
 #include <stdarg.h>
 
-ros::Publisher stringPublisher;
+ros::Publisher kidnappedPublisher;
+ros::Publisher longTouchPublisher;
 ros::Publisher posePublisher;
+ros::Publisher stringPublisher;
+ros::Publisher touchEndPublisher;
+ros::Publisher touchStartPublisher;
 
 void log(const char *msg, ...) {
     va_list args;
     va_start(args, msg);
+#ifdef Q_OS_ANDROID
     __android_log_vprint(ANDROID_LOG_INFO, "RosNode", msg, args);
+#else
+    vprintf(msg, args);
+#endif
     va_end(args);
 }
 
@@ -61,7 +78,9 @@ RosNode::RosNode(QQuickItem* parent):
     QQuickItem(parent)
 {
     status = "Idle";
-    masterIp = "192.168.1.100:11311";
+    masterIp = "192.168.1.100";
+
+    startNode();
 }
 
 RosNode::~RosNode(){
@@ -98,17 +117,19 @@ void RosNode::startNode() {
 
     ros::NodeHandle nodeHandle;
 
-    QString stringTopic("ros_qml_plugin_" + sanitizedNodeIp + "_string");
-    // const std::string topicStdString = topic.toStdString();
+    QString celluloTopic("cellulo");
 
-    QString poseTopic("ros_qml_plugin_" + sanitizedNodeIp + "_pose");
-    // const std::string topicGeometryPose = topic.toStdString();
-
-    stringPublisher = nodeHandle.advertise<std_msgs::String>(stringTopic.toStdString(), 1000);
-    posePublisher = nodeHandle.advertise<geometry_msgs::Pose>(poseTopic.toStdString(), 1000);
+    kidnappedPublisher = nodeHandle.advertise<cellulo_msgs::Kidnapped>(celluloTopic.toStdString(), 1000);
+    longTouchPublisher = nodeHandle.advertise<cellulo_msgs::LongTouch>(celluloTopic.toStdString(), 1000);
+    posePublisher = nodeHandle.advertise<cellulo_msgs::Pose>(celluloTopic.toStdString(), 1000);
+    stringPublisher = nodeHandle.advertise<std_msgs::String>(celluloTopic.toStdString(), 1000);
+    touchEndPublisher = nodeHandle.advertise<cellulo_msgs::TouchEnd>(celluloTopic.toStdString(), 1000);
+    touchStartPublisher = nodeHandle.advertise<cellulo_msgs::TouchStart>(celluloTopic.toStdString(), 1000);
 
     status = "Running";
     emit RosNode::statusChanged();
+
+    log("Node started");
 }
 
 void RosNode::stopNode() {
@@ -118,32 +139,41 @@ void RosNode::stopNode() {
     emit RosNode::statusChanged();
 }
 
-void RosNode::publish(QString msg) {
+void RosNode::publishString(QString id, QString msg) {
     if (!ros::ok()) {
         log("Cannot publish: ros::ok() returned false");
         return;
     }
 
+    msg = QString::number(ros::Time::now().toNSec()) + ", " + msg;
     QByteArray ba = msg.toUtf8();
-    std_msgs::String rosMsg;
-    rosMsg.data = ba.data();
-    stringPublisher.publish(rosMsg);
+
+    cellulo_msgs::String str;
+    str.header.stamp = ros::Time::now().toNSec();
+    str.header.device_id = id.toStdString();
+    str.msg = ba.data();
+
+    log("time: %u", str.header.stamp);
+    log("device: %s", str.header.device_id.c_str());
+    log("msg: %s", str.msg.c_str());
+
+    std_msgs::String test;
+    test.data = "bla";
+    // stringPublisher.publish(str);
 }
 
-void RosNode::publish(QVector3D position, QQuaternion orientation) {
+void RosNode::publishPose(QString id, float x, float y, float theta) {
     if (!ros::ok()) {
         log("Cannot publish: ros::ok() returned false");
         return;
     }
 
-    geometry_msgs::Pose rosMsg;
-    rosMsg.position.x = position.x();
-    rosMsg.position.y = position.y();
-    rosMsg.position.z = position.z();
-    rosMsg.orientation.x = orientation.x();
-    rosMsg.orientation.y = orientation.y();
-    rosMsg.orientation.z = orientation.z();
-    rosMsg.orientation.w = orientation.scalar();
+    cellulo_msgs::Pose pose;
+    pose.header.stamp = ros::Time::now().toNSec();
+    pose.header.device_id = id.toStdString();
+    pose.position.x = x;
+    pose.position.y = y;
+    pose.angle = theta;
 
-    posePublisher.publish(rosMsg);
+    posePublisher.publish(pose);
 }

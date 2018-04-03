@@ -73,7 +73,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publish(message.text)
+                    onClicked: rosNode.publishString("DUMMY_ID", message.text)
                 }
             }
         }
@@ -98,43 +98,19 @@ ApplicationWindow {
                     text: "0.0"
                 }
 
-                TextField{
-                    id: posZ
-                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                    text: "0.0"
-                }
-
                 Label{
-                    text: "Orientation"
+                    text: "Angle"
                 }
 
                 TextField{
-                    id: quatX
+                    id: angle
                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                     text: "0.0"
-                }
-
-                TextField{
-                    id: quatY
-                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                    text: "0.0"
-                }
-
-                TextField{
-                    id: quatZ
-                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                    text: "0.0"
-                }
-
-                TextField{
-                    id: quatW
-                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                    text: "1.0"
                 }
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publish("posX.text, posY.text, posZ.text", "quatW.text, quatX.text, quatY.text, quatZ.text")
+                    onClicked: rosNode.publishPose("DUMMY_ID", posX.text, posY.text, angle.text)
                 }
             }
         }
