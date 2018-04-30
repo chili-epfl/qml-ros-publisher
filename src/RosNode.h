@@ -28,6 +28,12 @@
 #include <QQuaternion>
 #include <QQuickItem>
 
+#include <memory>
+#include <string>
+#include <unordered_map>
+
+#include <ros/ros.h>
+
 class RosNode : public QQuickItem {
     /* *INDENT-OFF* */
     Q_OBJECT
@@ -82,47 +88,11 @@ public slots:
      */
     void stopNode();
 
-    /**
-     * @brief Publishes a kidnapped event
-     *
-     * @param TRUE if kidnapped, FALSE if not
-     */
-    void publishKidnapped(const QString &id, bool kidnapped);
-
-    /**
-     * @brief Publishes a long touch event
-     *
-     * @param The touch key corresponding to the event
-     */
-    void publishLongTouch(const QString &id, int key);
-
-    /**
-     * @brief Publishes a pose
-     *
-     * @param The message to publish
-     */
-    void publishPose(const QString &id, float x, float y, float theta);
-
-    /**
-     * @brief Publishes a string message
-     *
-     * @param The message to publish
-     */
-    void publishString(const QString &id, const QString &text);
-
-    /**
-     * @brief Publishes a touch ended event
-     *
-     * @param The touch key corresponding to the event
-     */
-    void publishTouchEnd(const QString &id, int key);
-
-    /**
-     * @brief Publishes a touch started event
-     *
-     * @param The touch key corresponding to the event
-     */
-    void publishTouchStart(const QString &id, int key);
+    void publish(const QString &topic, const QString &id, bool value);
+    void publish(const QString &topic, const QString &id, float value);
+    void publish(const QString &topic, const QString &id, int value);
+    void publish(const QString &topic, const QString &id, const QVector3D &value);
+    void publish(const QString &topic, const QString &id, const QString &value);
 
 signals:
     /**
@@ -136,8 +106,28 @@ signals:
     void masterIpChanged();
 
 private:
+    template <class T>
+    ros::Publisher *obtainPublisher(const QString &topic) {
+        std::string _topic = topic.toStdString();
+
+        auto it = topics.find(_topic);
+        if (it == topics.end()) {
+            auto result = topics.emplace(
+                _topic,
+                std::unique_ptr<ros::Publisher>(new ros::Publisher(nodeHandle->advertise<T>(_topic, 1000)))
+            );
+
+            it = result.first;
+        }
+
+        return it->second.get();
+    }
+
     QString status;                   ///< Status of this ROS node
     QString masterIp;                 ///< IP address of ROS master
+
+    std::unique_ptr<ros::NodeHandle> nodeHandle;
+    std::unordered_map<std::string, std::unique_ptr<ros::Publisher>> topics;
 };
 
 #endif /* ROSNODE_H */
