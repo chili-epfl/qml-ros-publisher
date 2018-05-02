@@ -77,7 +77,6 @@ public:
     void setMasterIp(const QString &masterIp) { this->masterIp = masterIp; }
 
 public slots:
-
     /**
      * @brief Initializes the ROS node
      */
@@ -110,9 +109,9 @@ private:
     ros::Publisher *obtainPublisher(const QString &topic) {
         std::string _topic = topic.toStdString();
 
-        auto it = topics.find(_topic);
-        if (it == topics.end()) {
-            auto result = topics.emplace(
+        auto it = publishers.find(_topic);
+        if (it == publishers.end()) {
+            auto result = publishers.emplace(
                 _topic,
                 std::unique_ptr<ros::Publisher>(new ros::Publisher(nodeHandle->advertise<T>(_topic, 1000)))
             );
@@ -127,7 +126,7 @@ private:
     QString masterIp;                 ///< IP address of ROS master
 
     std::unique_ptr<ros::NodeHandle> nodeHandle;
-    std::unordered_map<std::string, std::unique_ptr<ros::Publisher>> topics;
+    std::unordered_map<std::string, std::unique_ptr<ros::Publisher>> publishers;
 };
 
 #endif /* ROSNODE_H */

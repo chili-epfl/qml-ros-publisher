@@ -29,6 +29,7 @@
 #else
 #include <cstdio>
 #endif
+#include <stdarg.h>
 
 #include <chili_msgs/Bool.h>
 #include <chili_msgs/Float32.h>
@@ -37,15 +38,6 @@
 #include <chili_msgs/String.h>
 
 #include <QNetworkInterface>
-
-#include <stdarg.h>
-
-ros::Publisher kidnappedPublisher;
-ros::Publisher longTouchPublisher;
-ros::Publisher posePublisher;
-ros::Publisher stringPublisher;
-ros::Publisher touchEndPublisher;
-ros::Publisher touchStartPublisher;
 
 static void log(const char *msg, ...) {
     va_list args;
@@ -75,8 +67,6 @@ RosNode::RosNode(QQuickItem* parent)
 : QQuickItem(parent) {
     status = "Idle";
     masterIp = "192.168.1.100";
-
-    startNode();
 }
 
 RosNode::~RosNode() {
@@ -119,10 +109,12 @@ void RosNode::startNode() {
 }
 
 void RosNode::stopNode() {
+    publishers.clear();
+    delete nodeHandle.release();
     ros::shutdown();
-
     status = "Idle";
-    emit RosNode::statusChanged();
+
+    emit statusChanged();
 }
 
 static void fillHeader(chili_msgs::Header &header, const QString &id) {
