@@ -73,7 +73,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publishString("DUMMY_ID", message.text)
+                    onClicked: rosNode.publish("test_topic", "DUMMY_ID", message.text)
                 }
             }
         }
@@ -110,7 +110,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publishPose("DUMMY_ID", posX.text, posY.text, angle.text)
+                    onClicked: rosNode.publish("test_topic", "DUMMY_ID", Qt.vector3d(posX.text, posY.text, angle.text))
                 }
             }
         }

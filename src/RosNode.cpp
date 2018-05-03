@@ -34,8 +34,9 @@
 #include <chili_msgs/Bool.h>
 #include <chili_msgs/Float32.h>
 #include <chili_msgs/Int32.h>
-#include <chili_msgs/Pose2D.h>
 #include <chili_msgs/String.h>
+#include <chili_msgs/Vector2Float32.h>
+#include <chili_msgs/Vector3Float32.h>
 
 #include <QNetworkInterface>
 
@@ -149,14 +150,24 @@ void RosNode::publish(const QString &topic, const QString &id, int value) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, const QVector3D &value) {
-    auto publisher = obtainPublisher<chili_msgs::Pose2D>(topic);
+void RosNode::publish(const QString &topic, const QString &id, const QVector2D &value) {
+    auto publisher = obtainPublisher<chili_msgs::Vector2Float32>(topic);
 
-    chili_msgs::Pose2D msg;
+    chili_msgs::Vector2Float32 msg;
     fillHeader(msg.header, id);
-    msg.pose.x = value.x();
-    msg.pose.y = value.y();
-    msg.pose.theta = value.z();
+    msg.x = value.x();
+    msg.y = value.y();
+    publisher->publish(msg);
+}
+
+void RosNode::publish(const QString &topic, const QString &id, const QVector3D &value) {
+    auto publisher = obtainPublisher<chili_msgs::Vector3Float32>(topic);
+
+    chili_msgs::Vector3Float32 msg;
+    fillHeader(msg.header, id);
+    msg.x = value.x();
+    msg.y = value.y();
+    msg.z = value.z();
     publisher->publish(msg);
 }
 
