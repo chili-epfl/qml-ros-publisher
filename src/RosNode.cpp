@@ -37,6 +37,7 @@
 #include <chili_msgs/String.h>
 #include <chili_msgs/Vector2Float32.h>
 #include <chili_msgs/Vector3Float32.h>
+#include <chili_msgs/Vector2Int32.h>
 
 #include <QNetworkInterface>
 
@@ -147,6 +148,16 @@ void RosNode::publish(const QString &topic, const QString &id, int value) {
     chili_msgs::Int32 msg;
     fillHeader(msg.header, id);
     msg.value = value;
+    publisher->publish(msg);
+}
+
+void RosNode::publish(const QString &topic, const QString &id, int x, int y) {
+    auto publisher = obtainPublisher<chili_msgs::Vector2Int32>(topic);
+
+    chili_msgs::Vector2Int32 msg;
+    fillHeader(msg.header, id);
+    msg.x = x;
+    msg.y = y;
     publisher->publish(msg);
 }
 
