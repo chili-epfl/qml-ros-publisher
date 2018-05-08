@@ -76,6 +76,9 @@ RosNode::~RosNode() {
 }
 
 void RosNode::startNode() {
+    if (status == "Running")
+        return;
+
     QString nodeIp = getDeviceIpAddress();
     QString sanitizedNodeIp = QString(nodeIp).replace('.', '_');
     QByteArray tmp = nodeIp.toUtf8();
@@ -111,6 +114,9 @@ void RosNode::startNode() {
 }
 
 void RosNode::stopNode() {
+    if (status == "Idle")
+        return;
+
     publishers.clear();
     delete nodeHandle.release();
     ros::shutdown();
