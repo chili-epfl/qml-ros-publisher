@@ -88,8 +88,8 @@ public slots:
     void stopNode();
 
     void publish(const QString &topic, const QString &id, bool value);
-    void publish(const QString &topic, const QString &id, float value);
     void publish(const QString &topic, const QString &id, int value);
+    void publish(const QString &topic, const QString &id, float value);
     void publish(const QString &topic, const QString &id, int x, int y);
     void publish(const QString &topic, const QString &id, const QVector2D &value);
     void publish(const QString &topic, const QString &id, const QVector3D &value);
@@ -115,7 +115,7 @@ private:
         if (it == publishers.end()) {
             auto result = publishers.emplace(
                 _topic,
-                std::unique_ptr<ros::Publisher>(new ros::Publisher(nodeHandle->advertise<T>(_topic, 1000)))
+                std::unique_ptr<ros::Publisher>(new ros::Publisher(nodeHandle->advertise<T>(_topic, 1000, true)))
             );
 
             it = result.first;

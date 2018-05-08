@@ -133,19 +133,19 @@ void RosNode::publish(const QString &topic, const QString &id, bool value) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, float value) {
-    auto publisher = obtainPublisher<chili_msgs::Float32>(topic);
+void RosNode::publish(const QString &topic, const QString &id, int value) {
+    auto publisher = obtainPublisher<chili_msgs::Int32>(topic);
 
-    chili_msgs::Float32 msg;
+    chili_msgs::Int32 msg;
     fillHeader(msg.header, id);
     msg.value = value;
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, int value) {
-    auto publisher = obtainPublisher<chili_msgs::Int32>(topic);
+void RosNode::publish(const QString &topic, const QString &id, float value) {
+    auto publisher = obtainPublisher<chili_msgs::Float32>(topic);
 
-    chili_msgs::Int32 msg;
+    chili_msgs::Float32 msg;
     fillHeader(msg.header, id);
     msg.value = value;
     publisher->publish(msg);
@@ -184,6 +184,8 @@ void RosNode::publish(const QString &topic, const QString &id, const QVector3D &
 
 void RosNode::publish(const QString &topic, const QString &id, const QString &value) {
     auto publisher = obtainPublisher<chili_msgs::String>(topic);
+
+    log("Topic: %s, msg: %s", topic.toStdString().c_str(), value.toStdString().c_str());
 
     chili_msgs::String msg;
     fillHeader(msg.header, id);
