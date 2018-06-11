@@ -1,4 +1,4 @@
-qml-ros
+qml-ros-publisher
 ===================
 
 QML plugin for publishing messages to a ROS master. Tested with Qt 5.10.0 on

@@ -16,13 +16,13 @@
  */
 
 /**
- * @file QMLRos.cpp
- * @brief QML wrapper source for RosNode
+ * @file RosPublisher.cpp
+ * @brief QML wrapper source for RosPublisher
  * @author Florian Zimmermann
  * @date 2018-03-26
  */
 
-#include "RosNode.h"
+#include "RosPublisher.h"
 
 #ifdef Q_OS_ANDROID
 #include <android/log.h>
@@ -45,7 +45,7 @@ static void log(const char *msg, ...) {
     va_list args;
     va_start(args, msg);
 #ifdef Q_OS_ANDROID
-    __android_log_vprint(ANDROID_LOG_INFO, "RosNode", msg, args);
+    __android_log_vprint(ANDROID_LOG_INFO, "RosPublisher", msg, args);
 #else
     vprintf(msg, args);
 #endif
@@ -65,17 +65,17 @@ static QString getDeviceIpAddress() {
     return "";
 }
 
-RosNode::RosNode(QQuickItem* parent)
+RosPublisher::RosPublisher(QQuickItem* parent)
 : QQuickItem(parent) {
     status = "Idle";
     masterIp = "192.168.1.100";
 }
 
-RosNode::~RosNode() {
+RosPublisher::~RosPublisher() {
     stopNode();
 }
 
-void RosNode::startNode() {
+void RosPublisher::startNode() {
     if (status == "Running")
         return;
 
@@ -108,12 +108,12 @@ void RosNode::startNode() {
     nodeHandle.reset(new ros::NodeHandle());
 
     status = "Running";
-    emit RosNode::statusChanged();
+    emit RosPublisher::statusChanged();
 
     log("Node started");
 }
 
-void RosNode::stopNode() {
+void RosPublisher::stopNode() {
     if (status == "Idle")
         return;
 
@@ -130,7 +130,7 @@ static void fillHeader(chili_msgs::Header &header, const QString &id) {
     header.id = id.toStdString();
 }
 
-void RosNode::publish(const QString &topic, const QString &id, bool value) {
+void RosPublisher::publish(const QString &topic, const QString &id, bool value) {
     auto publisher = obtainPublisher<chili_msgs::Bool>(topic);
 
     chili_msgs::Bool msg;
@@ -139,7 +139,7 @@ void RosNode::publish(const QString &topic, const QString &id, bool value) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, int value) {
+void RosPublisher::publish(const QString &topic, const QString &id, int value) {
     auto publisher = obtainPublisher<chili_msgs::Int32>(topic);
 
     chili_msgs::Int32 msg;
@@ -148,7 +148,7 @@ void RosNode::publish(const QString &topic, const QString &id, int value) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, float value) {
+void RosPublisher::publish(const QString &topic, const QString &id, float value) {
     auto publisher = obtainPublisher<chili_msgs::Float32>(topic);
 
     chili_msgs::Float32 msg;
@@ -157,7 +157,7 @@ void RosNode::publish(const QString &topic, const QString &id, float value) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, int x, int y) {
+void RosPublisher::publish(const QString &topic, const QString &id, int x, int y) {
     auto publisher = obtainPublisher<chili_msgs::Vector2Int32>(topic);
 
     chili_msgs::Vector2Int32 msg;
@@ -167,7 +167,7 @@ void RosNode::publish(const QString &topic, const QString &id, int x, int y) {
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, const QVector2D &value) {
+void RosPublisher::publish(const QString &topic, const QString &id, const QVector2D &value) {
     auto publisher = obtainPublisher<chili_msgs::Vector2Float32>(topic);
 
     chili_msgs::Vector2Float32 msg;
@@ -177,7 +177,7 @@ void RosNode::publish(const QString &topic, const QString &id, const QVector2D &
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, const QVector3D &value) {
+void RosPublisher::publish(const QString &topic, const QString &id, const QVector3D &value) {
     auto publisher = obtainPublisher<chili_msgs::Vector3Float32>(topic);
 
     chili_msgs::Vector3Float32 msg;
@@ -188,7 +188,7 @@ void RosNode::publish(const QString &topic, const QString &id, const QVector3D &
     publisher->publish(msg);
 }
 
-void RosNode::publish(const QString &topic, const QString &id, const QString &value) {
+void RosPublisher::publish(const QString &topic, const QString &id, const QString &value) {
     auto publisher = obtainPublisher<chili_msgs::String>(topic);
 
     log("Topic: %s, msg: %s", topic.toStdString().c_str(), value.toStdString().c_str());

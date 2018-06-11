@@ -16,14 +16,14 @@
  */
 
 /**
- * @file QMLRos.h
- * @brief QML wrapper header for RosNode
+ * @file RosPublisher.h
+ * @brief QML wrapper header for RosPublisher
  * @author Florian Zimmermann
  * @date 2018-03-26
  */
 
-#ifndef ROSNODE_H
-#define ROSNODE_H
+#ifndef ROSPUBLISHER_H
+#define ROSPUBLISHER_H
 
 #include <QQuaternion>
 #include <QQuickItem>
@@ -34,7 +34,7 @@
 
 #include <ros/ros.h>
 
-class RosNode : public QQuickItem {
+class RosPublisher : public QQuickItem {
     /* *INDENT-OFF* */
     Q_OBJECT
     /* *INDENT-ON* */
@@ -44,16 +44,16 @@ class RosNode : public QQuickItem {
 
 public:
     /**
-     * @brief Creates a new RosNode with the given QML parent
+     * @brief Creates a new RosPublisher with the given QML parent
      *
      * @param parent The QML parent
      */
-    RosNode(QQuickItem* parent = 0);
+    RosPublisher(QQuickItem* parent = 0);
 
     /**
-     * @brief Destroys this RosNode
+     * @brief Destroys this RosPublisher
      */
-    ~RosNode();
+    ~RosPublisher();
 
     /**
      * @brief Gets this ROS node's status
@@ -131,4 +131,4 @@ private:
     std::unordered_map<std::string, std::unique_ptr<ros::Publisher>> publishers;
 };
 
-#endif /* ROSNODE_H */
+#endif /* ROSPUBLISHER_H */

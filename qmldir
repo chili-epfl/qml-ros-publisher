@@ -1,2 +1,2 @@
-module QMLRos
-plugin qmlrosplugin
+module ch.epfl.chili
+plugin rospublisherplugin

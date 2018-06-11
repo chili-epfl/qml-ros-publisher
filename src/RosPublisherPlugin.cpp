@@ -16,26 +16,15 @@
  */
 
 /**
- * @file QMLRos.h
+ * @file RosPublisher.h
  * @brief Object that exposes the QMLRos plugin components as QML objects
  * @author Florian Zimmermann
  * @date 2018-03-26
  */
 
-#ifndef QMLROSPLUGIN_H
-#define QMLROSPLUGIN_H
+#include "RosPublisherPlugin.h"
+#include "RosPublisher.h"
 
-#include <QQmlExtensionPlugin>
-#include <qqml.h>
-
-class QMLRosPlugin : public QQmlExtensionPlugin {
-    /* *INDENT-OFF* */
-    Q_OBJECT
-    /* *INDENT-ON* */
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
-
-public:
-    void registerTypes(const char* uri);
-};
-
-#endif /* QMLROSPLUGIN_H */
+void RosPublisherPlugin::registerTypes(const char* uri){
+    qmlRegisterType<RosPublisher>(uri, 1, 0, "RosPublisher");
+}

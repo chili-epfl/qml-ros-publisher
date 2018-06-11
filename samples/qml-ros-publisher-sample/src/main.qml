@@ -2,7 +2,7 @@ import QtQuick 2.2
 import QtQuick.Window 2.1
 import QtQuick.Controls 1.2
 
-import QMLRos 1.0
+import ch.epfl.chili 1.0
 
 ApplicationWindow {
     id: window
@@ -10,13 +10,13 @@ ApplicationWindow {
     minimumHeight: height
     minimumWidth: width
 
-    RosNode{
-        id: rosNode
+    RosPublisher {
+        id: rosPublisher
         masterIp: masterIpField.text
 
         onStatusChanged: {
-            status.text = rosNode.status
-            if (rosNode.status == "Idle")
+            status.text = rosPublisher.status
+            if (rosPublisher.status == "Idle")
                 status.color = "gray";
             else
                 status.color = "blue";
@@ -25,7 +25,7 @@ ApplicationWindow {
 
     Row{
         GroupBox{
-            title: "RosNode"
+            title: "RosPublisher"
 
             Column{
                 Label{
@@ -38,12 +38,12 @@ ApplicationWindow {
 
                 Button{
                     text: "Start"
-                    onClicked: rosNode.startNode();
+                    onClicked: rosPublisher.startNode();
                 }
 
                 Button{
                     text: "Stop"
-                    onClicked: rosNode.stopNode();
+                    onClicked: rosPublisher.stopNode();
                 }
 
                 Label{
@@ -52,7 +52,7 @@ ApplicationWindow {
 
                 Text{
                     id: status
-                    text: rosNode.status
+                    text: rosPublisher.status
                     color: "gray"
                 }
             }
@@ -73,7 +73,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publish("test_topic", "DUMMY_ID", message.text)
+                    onClicked: rosPublisher.publish("test_topic", "DUMMY_ID", message.text)
                 }
             }
         }
@@ -110,7 +110,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosNode.publish("test_topic", "DUMMY_ID", Qt.vector3d(posX.text, posY.text, angle.text))
+                    onClicked: rosPublisher.publish("test_topic", "DUMMY_ID", Qt.vector3d(posX.text, posY.text, angle.text))
                 }
             }
         }

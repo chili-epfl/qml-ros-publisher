@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = qmlrosplugin
+TARGET = rospublisherplugin
 
 CONFIG += qt plugin c++11
 CONFIG -= android_install
@@ -13,15 +13,15 @@ QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS_RELEASE += -O3
 
 TARGET = $$qtLibraryTarget($$TARGET)
-uri = QMLRos
+uri = ch.epfl.chili
 
 HEADERS += \
-    src/QMLRosPlugin.h \
-    src/RosNode.h
+    src/RosPublisherPlugin.h \
+    src/RosPublisher.h
 
 SOURCES += \
-    src/QMLRosPlugin.cpp \
-    src/RosNode.cpp
+    src/RosPublisherPlugin.cpp \
+    src/RosPublisher.cpp
 
 OTHER_FILES += qmldir
 
