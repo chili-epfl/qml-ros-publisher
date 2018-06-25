@@ -13,7 +13,7 @@ QMAKE_CXXFLAGS += -O3
 QMAKE_CXXFLAGS_RELEASE += -O3
 
 TARGET = $$qtLibraryTarget($$TARGET)
-uri = ch.epfl.chili
+uri = ch.epfl.chili.ros.publisher
 
 HEADERS += \
     src/RosPublisherPlugin.h \

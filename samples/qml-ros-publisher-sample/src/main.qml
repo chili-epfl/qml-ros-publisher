@@ -2,7 +2,7 @@ import QtQuick 2.2
 import QtQuick.Window 2.1
 import QtQuick.Controls 1.2
 
-import ch.epfl.chili 1.0
+import ch.epfl.chili.ros.publisher 1.0
 
 ApplicationWindow {
     id: window
@@ -73,7 +73,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosPublisher.publish("test_topic", "DUMMY_ID", message.text)
+                    onClicked: rosPublisher.publishString("test_topic", "DUMMY_ID", message.text)
                 }
             }
         }
@@ -110,7 +110,7 @@ ApplicationWindow {
 
                 Button{
                     text: "Publish"
-                    onClicked: rosPublisher.publish("test_topic", "DUMMY_ID", Qt.vector3d(posX.text, posY.text, angle.text))
+                    onClicked: rosPublisher.publishDoubleArray("test_topic", "DUMMY_ID", [posX.text, posY.text, angle.text])
                 }
             }
         }
