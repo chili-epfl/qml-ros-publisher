@@ -32,12 +32,11 @@
 #include <stdarg.h>
 
 #include <chili_msgs/Bool.h>
-#include <chili_msgs/Float32.h>
-#include <chili_msgs/Int32.h>
+#include <chili_msgs/Int.h>
+#include <chili_msgs/Double.h>
 #include <chili_msgs/String.h>
-#include <chili_msgs/Vector2Float32.h>
-#include <chili_msgs/Vector3Float32.h>
-#include <chili_msgs/Vector2Int32.h>
+#include <chili_msgs/IntArray.h>
+#include <chili_msgs/DoubleArray.h>
 
 #include <QNetworkInterface>
 
@@ -130,7 +129,7 @@ static void fillHeader(chili_msgs::Header &header, const QString &id) {
     header.id = id.toStdString();
 }
 
-void RosPublisher::publish(const QString &topic, const QString &id, bool value) {
+void RosPublisher::publishBool(const QString &topic, const QString &id, bool value) {
     auto publisher = obtainPublisher<chili_msgs::Bool>(topic);
 
     chili_msgs::Bool msg;
@@ -139,56 +138,25 @@ void RosPublisher::publish(const QString &topic, const QString &id, bool value) 
     publisher->publish(msg);
 }
 
-void RosPublisher::publish(const QString &topic, const QString &id, int value) {
-    auto publisher = obtainPublisher<chili_msgs::Int32>(topic);
+void RosPublisher::publishInt(const QString &topic, const QString &id, int value) {
+    auto publisher = obtainPublisher<chili_msgs::Int>(topic);
 
-    chili_msgs::Int32 msg;
+    chili_msgs::Int msg;
     fillHeader(msg.header, id);
     msg.value = value;
     publisher->publish(msg);
 }
 
-void RosPublisher::publish(const QString &topic, const QString &id, float value) {
-    auto publisher = obtainPublisher<chili_msgs::Float32>(topic);
+void RosPublisher::publishDouble(const QString &topic, const QString &id, double value) {
+    auto publisher = obtainPublisher<chili_msgs::Double>(topic);
 
-    chili_msgs::Float32 msg;
+    chili_msgs::Double msg;
     fillHeader(msg.header, id);
     msg.value = value;
     publisher->publish(msg);
 }
 
-void RosPublisher::publish(const QString &topic, const QString &id, int x, int y) {
-    auto publisher = obtainPublisher<chili_msgs::Vector2Int32>(topic);
-
-    chili_msgs::Vector2Int32 msg;
-    fillHeader(msg.header, id);
-    msg.x = x;
-    msg.y = y;
-    publisher->publish(msg);
-}
-
-void RosPublisher::publish(const QString &topic, const QString &id, const QVector2D &value) {
-    auto publisher = obtainPublisher<chili_msgs::Vector2Float32>(topic);
-
-    chili_msgs::Vector2Float32 msg;
-    fillHeader(msg.header, id);
-    msg.x = value.x();
-    msg.y = value.y();
-    publisher->publish(msg);
-}
-
-void RosPublisher::publish(const QString &topic, const QString &id, const QVector3D &value) {
-    auto publisher = obtainPublisher<chili_msgs::Vector3Float32>(topic);
-
-    chili_msgs::Vector3Float32 msg;
-    fillHeader(msg.header, id);
-    msg.x = value.x();
-    msg.y = value.y();
-    msg.z = value.z();
-    publisher->publish(msg);
-}
-
-void RosPublisher::publish(const QString &topic, const QString &id, const QString &value) {
+void RosPublisher::publishString(const QString &topic, const QString &id, const QString &value) {
     auto publisher = obtainPublisher<chili_msgs::String>(topic);
 
     log("Topic: %s, msg: %s", topic.toStdString().c_str(), value.toStdString().c_str());
@@ -196,5 +164,33 @@ void RosPublisher::publish(const QString &topic, const QString &id, const QStrin
     chili_msgs::String msg;
     fillHeader(msg.header, id);
     msg.value = value.toStdString();
+    publisher->publish(msg);
+}
+
+void RosPublisher::publishIntArray(const QString &topic, const QString &id, const QVariantList &data) {
+    auto publisher = obtainPublisher<chili_msgs::IntArray>(topic);
+
+    chili_msgs::IntArray msg;
+    fillHeader(msg.header, id);
+
+    msg.data.reserve(data.size());
+    for (auto &value : data) {
+        msg.data.push_back(value.toInt());
+    }
+
+    publisher->publish(msg);
+}
+
+void RosPublisher::publishDoubleArray(const QString &topic, const QString &id, const QVariantList &data) {
+    auto publisher = obtainPublisher<chili_msgs::DoubleArray>(topic);
+
+    chili_msgs::DoubleArray msg;
+    fillHeader(msg.header, id);
+
+    msg.data.reserve(data.size());
+    for (auto &value : data) {
+        msg.data.push_back(value.toDouble());
+    }
+
     publisher->publish(msg);
 }

@@ -87,13 +87,12 @@ public slots:
      */
     void stopNode();
 
-    void publish(const QString &topic, const QString &id, bool value);
-    void publish(const QString &topic, const QString &id, int value);
-    void publish(const QString &topic, const QString &id, float value);
-    void publish(const QString &topic, const QString &id, int x, int y);
-    void publish(const QString &topic, const QString &id, const QVector2D &value);
-    void publish(const QString &topic, const QString &id, const QVector3D &value);
-    void publish(const QString &topic, const QString &id, const QString &value);
+    void publishBool(const QString &topic, const QString &id, bool value);
+    void publishInt(const QString &topic, const QString &id, int value);
+    void publishDouble(const QString &topic, const QString &id, double value);
+    void publishString(const QString &topic, const QString &id, const QString &value);
+    void publishIntArray(const QString &topic, const QString &id, const QVariantList &data);
+    void publishDoubleArray(const QString &topic, const QString &id, const QVariantList &data);
 
 signals:
     /**
